@@ -9,13 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "GPUImage.h"
 @interface ViewController : UIViewController
-{
-    GPUImagePicture *sourcePicture;
-    GPUImageOutput<GPUImageInput> *sepiaFilter, *sepiaFilter2;
-    
-    UISlider *imageSlider;
-}
-
 
 
 @end

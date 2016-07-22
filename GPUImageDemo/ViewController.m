@@ -8,11 +8,18 @@
 
 #import "ViewController.h"
 
+
+
+#define SCREEN_WID ([UIScreen mainScreen].bounds.size.width)
+#define SCREEN_HEI ([UIScreen mainScreen].bounds.size.height)
+
 @interface ViewController ()
 {
     GPUImagePicture * _sourcePicture;
     
     GPUImageOutput <GPUImageInput> * _filter;
+    GPUImageStillCamera *stillCamera;
+
 }
 
 - (IBAction)filterClicked:(id)sender;
@@ -25,6 +32,36 @@
     [super viewDidLoad];
     
 //    [self setUpFilter];
+}
+- (void)filterLiveVideo{
+    GPUImageVideoCamera *videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionBack];
+    videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
+
+    GPUImageFilter *customFilter = [[GPUImageGaussianBlurFilter alloc]init];
+    GPUImageView *filteredVideoView = [[GPUImageView alloc] initWithFrame:CGRectMake(0.0, 0.0, SCREEN_WID, SCREEN_HEI)];
+
+    // Add the view somewhere so it's visible
+
+    [videoCamera addTarget:customFilter];
+    [customFilter addTarget:filteredVideoView];
+    [_filter forceProcessingAtSize:filteredVideoView.sizeInPixels];
+    [self.view addSubview:filteredVideoView];
+    [videoCamera startCameraCapture];
+
+}
+- (void)filterStillPhoto{
+
+    stillCamera = [[GPUImageStillCamera alloc]
+                                        initWithSessionPreset:AVCaptureSessionPresetPhoto
+                                        cameraPosition:AVCaptureDevicePositionBack];
+    stillCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
+    GPUImageGammaFilter * filter = [[GPUImageGammaFilter alloc] init];
+    [stillCamera addTarget:filter];
+    GPUImageView *filterView = [[GPUImageView alloc] initWithFrame:CGRectMake(0.0, 0.0, SCREEN_WID, SCREEN_HEI)];
+    [filter addTarget:filterView];
+    [self.view addSubview:filterView];
+    [stillCamera startCameraCapture];
+
 }
 /**
  *  设置滤镜
@@ -60,7 +97,9 @@
 }
 
 - (IBAction)filterClicked:(id)sender {
-    [self setUpFilter];
+//    [self setUpFilter];
+    [self filterStillPhoto];
+//    [self filterLiveVideo];
 }
  #pragma mark - 调整颜色 Handle Color
 /**

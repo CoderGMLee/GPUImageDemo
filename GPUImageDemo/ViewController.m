@@ -7,22 +7,19 @@
 //
 
 #import "ViewController.h"
+#import "FilterStillPhotoVC.h"
 
-
-
-#define SCREEN_WID ([UIScreen mainScreen].bounds.size.width)
-#define SCREEN_HEI ([UIScreen mainScreen].bounds.size.height)
-
-@interface ViewController ()
+@interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
 {
     GPUImagePicture * _sourcePicture;
     
     GPUImageOutput <GPUImageInput> * _filter;
     GPUImageStillCamera *stillCamera;
+    UITableView * _tableView;
+    NSMutableArray * _dataSource;
 
 }
 
-- (IBAction)filterClicked:(id)sender;
 
 @end
 
@@ -30,8 +27,36 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-//    [self setUpFilter];
+    [self.navigationItem setTitle:@"GPUImageDemo"];
+    _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WID, SCREEN_HEI) style:UITableViewStylePlain];
+    [_tableView setDelegate:self];
+    [_tableView setDataSource:self];
+    [self.view addSubview:_tableView];
+
+    _dataSource = [[NSMutableArray alloc]initWithObjects:@"filterLiveVideo",@"filterStillPhoto", nil];
+
+}
+#pragma mark - UITableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return _dataSource.count;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+
+    UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    if (!cell) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
+    }
+    NSString * title = _dataSource[indexPath.row];
+    [cell.textLabel setText:title];
+    return cell;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (indexPath.row == 0) {
+
+    }else if (indexPath.row == 1){
+        FilterStillPhotoVC * stillPhotoVC = [[FilterStillPhotoVC alloc]init];
+        [self.navigationController pushViewController:stillPhotoVC animated:YES];
+    }
 }
 - (void)filterLiveVideo{
     GPUImageVideoCamera *videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionBack];
@@ -47,20 +72,6 @@
     [_filter forceProcessingAtSize:filteredVideoView.sizeInPixels];
     [self.view addSubview:filteredVideoView];
     [videoCamera startCameraCapture];
-
-}
-- (void)filterStillPhoto{
-
-    stillCamera = [[GPUImageStillCamera alloc]
-                                        initWithSessionPreset:AVCaptureSessionPresetPhoto
-                                        cameraPosition:AVCaptureDevicePositionBack];
-    stillCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
-    GPUImageGammaFilter * filter = [[GPUImageGammaFilter alloc] init];
-    [stillCamera addTarget:filter];
-    GPUImageView *filterView = [[GPUImageView alloc] initWithFrame:CGRectMake(0.0, 0.0, SCREEN_WID, SCREEN_HEI)];
-    [filter addTarget:filterView];
-    [self.view addSubview:filterView];
-    [stillCamera startCameraCapture];
 
 }
 /**
@@ -96,11 +107,7 @@
     [_sourcePicture processImage];
 }
 
-- (IBAction)filterClicked:(id)sender {
-//    [self setUpFilter];
-    [self filterStillPhoto];
-//    [self filterLiveVideo];
-}
+
  #pragma mark - 调整颜色 Handle Color
 /**
  *

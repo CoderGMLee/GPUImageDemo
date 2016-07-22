@@ -1,0 +1,20 @@
+//
+//  PrefixHeader.pch
+//  GPUImageDemo
+//
+//  Created by GM on 16/7/22.
+//  Copyright © 2016年 GM. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+#define SCREEN_WID ([UIScreen mainScreen].bounds.size.width)
+#define SCREEN_HEI ([UIScreen mainScreen].bounds.size.height)
+#define KNavHei 64
+
+
+#import "GPUImage.h"
+#import "UIView+Frame.h"
+
+#endif /* PrefixHeader_pch */
